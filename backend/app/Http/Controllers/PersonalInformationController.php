@@ -1,65 +1,76 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\PersonalInformation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PersonalInformationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
+
     public function index()
     {
-        //
+        $personalInformation = PersonalInformation::all();
+        return response()->json($personalInformation);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'email' => 'required|email|unique:personal_information',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $personalInformation = PersonalInformation::create($request->all());
+        return response()->json($personalInformation, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PersonalInformation $personalInformation)
+    public function show($id)
     {
-        //
+        $personalInformation = PersonalInformation::find($id);
+        if (!$personalInformation) {
+            return response()->json(['message' => 'Personal information not found'], 404);
+        }
+        return response()->json($personalInformation);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PersonalInformation $personalInformation)
+    public function update(Request $request, $id)
     {
-        //
+        $personalInformation = PersonalInformation::find($id);
+        if (!$personalInformation) {
+            return response()->json(['message' => 'Personal information not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'email' => 'email|unique:personal_information,email,' . $id,
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $personalInformation->update($request->all());
+        return response()->json($personalInformation, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PersonalInformation $personalInformation)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PersonalInformation $personalInformation)
-    {
-        //
+        $personalInformation = PersonalInformation::find($id);
+        if (!$personalInformation) {
+            return response()->json(['message' => 'Personal information not found'], 404);
+        }
+        $personalInformation->delete();
+        return response()->json(['message' => 'Personal information deleted successfully']);
     }
 }

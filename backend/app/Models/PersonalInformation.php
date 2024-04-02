@@ -3,9 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class PersonalInformation extends Model
 {
     use HasFactory;
+    protected $collection = 'personal_information';
+
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+    ];
+
 }

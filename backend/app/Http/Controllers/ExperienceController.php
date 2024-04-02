@@ -4,62 +4,76 @@ namespace App\Http\Controllers;
 
 use App\Models\Experience;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ExperienceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
+
     public function index()
     {
-        //
+        $experiences = Experience::all();
+        return response()->json($experiences);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'company' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $experience = Experience::create($request->all());
+        return response()->json($experience, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Experience $experience)
+    public function show($id)
     {
-        //
+        $experience = Experience::find($id);
+        if (!$experience) {
+            return response()->json(['message' => 'Experience not found'], 404);
+        }
+        return response()->json($experience);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Experience $experience)
+    public function update(Request $request, $id)
     {
-        //
+        $experience = Experience::find($id);
+        if (!$experience) {
+            return response()->json(['message' => 'Experience not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'string',
+            'company' => 'string',
+            'start_date' => 'date',
+            'end_date' => 'nullable|date|after:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $experience->update($request->all());
+        return response()->json($experience, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Experience $experience)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Experience $experience)
-    {
-        //
+        $experience = Experience::find($id);
+        if (!$experience) {
+            return response()->json(['message' => 'Experience not found'], 404);
+        }
+        $experience->delete();
+        return response()->json(['message' => 'Experience deleted successfully']);
     }
 }

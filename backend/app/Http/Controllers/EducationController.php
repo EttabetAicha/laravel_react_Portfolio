@@ -4,62 +4,76 @@ namespace App\Http\Controllers;
 
 use App\Models\Education;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class EducationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
+
     public function index()
     {
-        //
+        $educations = Education::all();
+        return response()->json($educations);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'degree' => 'required|string',
+            'institution' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $education = Education::create($request->all());
+        return response()->json($education, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Education $education)
+    public function show($id)
     {
-        //
+        $education = Education::find($id);
+        if (!$education) {
+            return response()->json(['message' => 'Education not found'], 404);
+        }
+        return response()->json($education);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Education $education)
+    public function update(Request $request, $id)
     {
-        //
+        $education = Education::find($id);
+        if (!$education) {
+            return response()->json(['message' => 'Education not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'degree' => 'string',
+            'institution' => 'string',
+            'start_date' => 'date',
+            'end_date' => 'nullable|date|after:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $education->update($request->all());
+        return response()->json($education, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Education $education)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Education $education)
-    {
-        //
+        $education = Education::find($id);
+        if (!$education) {
+            return response()->json(['message' => 'Education not found'], 404);
+        }
+        $education->delete();
+        return response()->json(['message' => 'Education deleted successfully']);
     }
 }
