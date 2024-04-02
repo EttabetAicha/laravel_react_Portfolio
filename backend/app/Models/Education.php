@@ -3,13 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 
-
-class Post extends Model
+class Education extends Model
 {
     use HasFactory;
-    protected $collection = 'posts';
-
-
 }
