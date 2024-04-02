@@ -17,7 +17,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    
+
 
     /*
     |--------------------------------------------------------------------------
@@ -169,6 +169,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        MongoDB\Laravel\MongoDBServiceProvider::class,
+
     ])->toArray(),
 
     /*

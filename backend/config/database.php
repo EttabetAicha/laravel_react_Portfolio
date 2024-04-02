@@ -34,11 +34,12 @@ return [
     */
 
     'connections' => [
+
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('DB_URI', 'mongodb+srv://username:password@<atlas-cluster-uri>/myappdb?retryWrites=true&w=majority'),
-            'database' => 'myappdb',
-        ],
+            'dsn' => env('DB_URI', 'mongodb+srv://aicha16ettabite:2pHlyzmjkLsciADV@cluster0.m5zmwul.mongodb.net/test?retryWrites=true&w=majority'),
+            'database' => 'test',
+    ],
 
         'sqlite' => [
             'driver' => 'sqlite',
