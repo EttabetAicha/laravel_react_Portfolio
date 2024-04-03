@@ -11,7 +11,7 @@ class PersonalInformation extends Model
     protected $collection = 'personal_information';
 
     protected $fillable = [
-        'image',
+        'images',
         'first_name',
         'last_name',
         'email',

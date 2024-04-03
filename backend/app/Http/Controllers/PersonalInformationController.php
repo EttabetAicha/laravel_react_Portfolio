@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\PersonalInformation;
@@ -24,23 +25,23 @@ class PersonalInformationController extends Controller
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'email' => 'required|email|unique:personal_information',
+            'images' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $personalInformation = PersonalInformation::create($request->all());
-        return response()->json($personalInformation, 201);
-    }
-
-    public function show($id)
-    {
-        $personalInformation = PersonalInformation::find($id);
-        if (!$personalInformation) {
-            return response()->json(['message' => 'Personal information not found'], 404);
+        $imagePath = null;
+        if ($request->hasFile('images')) {
+            $image = $request->file('images');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $imagePath = 'images/' . $imageName;
         }
-        return response()->json($personalInformation);
+
+        $personalInformation = PersonalInformation::create(array_merge($request->all(), ['images' => $imagePath]));
+        return response()->json($personalInformation, 201);
     }
 
     public function update(Request $request, $id)
@@ -54,15 +55,26 @@ class PersonalInformationController extends Controller
             'first_name' => 'string',
             'last_name' => 'string',
             'email' => 'email|unique:personal_information,email,' . $id,
+            'images' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $personalInformation->update($request->all());
+        // Handle image update
+        if ($request->hasFile('images')) {
+            $image = $request->file('images');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $imagePath = 'images/' . $imageName;
+            $personalInformation->image = $imagePath;
+        }
+
+        $personalInformation->update($request->except('images')); 
         return response()->json($personalInformation, 200);
     }
+
 
     public function destroy($id)
     {
