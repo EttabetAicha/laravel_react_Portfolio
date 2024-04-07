@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Validator;
 
 class PersonalInformationController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:sanctum')->except(['index', 'show']);
+    // }
 
     public function index()
     {
@@ -71,7 +71,7 @@ class PersonalInformationController extends Controller
             $personalInformation->image = $imagePath;
         }
 
-        $personalInformation->update($request->except('images')); 
+        $personalInformation->update($request->except('images'));
         return response()->json($personalInformation, 200);
     }
 

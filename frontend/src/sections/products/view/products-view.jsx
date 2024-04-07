@@ -1,63 +1,51 @@
-import { useState } from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
-import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
+import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-
-import { products } from 'src/_mock/products';
-
-import ProductCard from '../product-card';
-import ProductSort from '../product-sort';
-import ProductFilters from '../product-filters';
-import ProductCartWidget from '../product-cart-widget';
-
-// ----------------------------------------------------------------------
+import CardContent from '@mui/material/CardContent';
 
 export default function ProductsView() {
-  const [openFilter, setOpenFilter] = useState(false);
+  const [personalInfo, setPersonalInfo] = useState([]);
 
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
-  };
+  useEffect(() => {
+    const fetchPersonalInfo = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/personal-information');
+        setPersonalInfo(response.data);
+      } catch (error) {
+        console.error('Error fetching personal information:', error);
+      }
+    };
 
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
+    fetchPersonalInfo();
+  }, []);
 
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
+        Personal Information
       </Typography>
-
-      <Stack
-        direction="row"
-        alignItems="center"
-        flexWrap="wrap-reverse"
-        justifyContent="flex-end"
-        sx={{ mb: 5 }}
-      >
-        <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-          <ProductFilters
-            openFilter={openFilter}
-            onOpenFilter={handleOpenFilter}
-            onCloseFilter={handleCloseFilter}
+      {personalInfo.map((item) => (
+        <Card key={item.id} sx={{ mb: 3 }}>
+          <CardMedia
+            component="img"
+            height="140"
+            image={item.images} // Assuming the image URL is stored in item.image
+            alt={`${item.first_name} ${item.last_name}`}
           />
-
-          <ProductSort />
-        </Stack>
-      </Stack>
-
-      <Grid container spacing={3}>
-        {products.map((product) => (
-          <Grid key={product.id} xs={12} sm={6} md={3}>
-            <ProductCard product={product} />
-          </Grid>
-        ))}
-      </Grid>
-
-      <ProductCartWidget />
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              {`${item.first_name} ${item.last_name}`}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {item.email}
+            </Typography>
+          </CardContent>
+        </Card>
+      ))}
     </Container>
   );
 }

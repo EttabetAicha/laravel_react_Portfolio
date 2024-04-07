@@ -38,7 +38,8 @@
           ".jsx",
           ".json"
         ]
-      }
+      },
+      "core-modules": ["@mui/icons-material"]
     }
   },
   "rules": {

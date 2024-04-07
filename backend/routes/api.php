@@ -26,7 +26,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::resource('users',UserController::class);
-Route::middleware('auth:sanctum')->apiResource('personal-information', PersonalInformationController::class);
+Route::resource('personal-information',PersonalInformationController::class);
+
+
+// Route::middleware('auth:sanctum')->apiResource('personal-information', PersonalInformationController::class);
 
 Route::middleware('auth:sanctum')->apiResource('education', EducationController::class);
 
