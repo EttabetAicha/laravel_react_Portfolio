@@ -26,7 +26,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::resource('users',UserController::class);
-Route::resource('personal-information',PersonalInformationController::class);
+// Route::resource('personal-information',PersonalInformationController::class);
+// Define individual routes for personal information CRUD operations
+Route::get('/personal-information', [PersonalInformationController::class, 'index']);
+Route::post('/personal-information', [PersonalInformationController::class, 'store']);
+Route::get('/personal-information/{id}', [PersonalInformationController::class, 'show']);
+Route::put('/personal-information/{id}', [PersonalInformationController::class, 'update']);
+Route::delete('/personal-information/{id}', [PersonalInformationController::class, 'destroy']);
 
 
 // Route::middleware('auth:sanctum')->apiResource('personal-information', PersonalInformationController::class);

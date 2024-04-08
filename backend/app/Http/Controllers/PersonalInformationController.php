@@ -54,26 +54,25 @@ class PersonalInformationController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'string',
             'last_name' => 'string',
-            'email' => 'email|unique:personal_information,email,' . $id,
-            'images' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'email' => 'email' ,
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        // Handle image update
-        if ($request->hasFile('images')) {
-            $image = $request->file('images');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
-            $imagePath = 'images/' . $imageName;
-            $personalInformation->image = $imagePath;
-        }
+      
 
-        $personalInformation->update($request->except('images'));
+        // Update personal information fields
+        $personalInformation->first_name = $request->input('first_name');
+        $personalInformation->last_name = $request->input('last_name');
+        $personalInformation->email = $request->input('email');
+
+        $personalInformation->save();
+
         return response()->json($personalInformation, 200);
     }
+
 
 
     public function destroy($id)
