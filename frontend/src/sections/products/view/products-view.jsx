@@ -1,7 +1,9 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
@@ -10,6 +12,13 @@ import CardContent from '@mui/material/CardContent';
 
 export default function ProductsView() {
   const [personalInfo, setPersonalInfo] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newItem, setNewItem] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    images: null // Updated attribute name for image
+  });
 
   useEffect(() => {
     fetchPersonalInfo();
@@ -30,7 +39,7 @@ export default function ProductsView() {
       window.alert('Error updating personal information: ID is empty or invalid.');
       return;
     }
-  
+
     try {
       const updatedItem = personalInfo.find(item => item._id === _id);
       await axios.put(`http://localhost:8000/api/personal-information/${_id}`, updatedItem);
@@ -40,7 +49,18 @@ export default function ProductsView() {
       window.alert('Error updating personal information.');
     }
   };
-  
+
+  const handleDelete = async (_id) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/personal-information/${_id}`);
+      const updatedPersonalInfo = personalInfo.filter(item => item._id !== _id);
+      setPersonalInfo(updatedPersonalInfo);
+      window.alert('Data deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting personal information:', error);
+      window.alert('Error deleting personal information.');
+    }
+  };
 
   const handleChange = (_id, field, value) => {
     const updatedPersonalInfo = personalInfo.map(item => {
@@ -50,6 +70,44 @@ export default function ProductsView() {
       return item;
     });
     setPersonalInfo(updatedPersonalInfo);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  const handleAdd = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleAddItem = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('first_name', newItem.first_name);
+      formData.append('last_name', newItem.last_name);
+      formData.append('email', newItem.email);
+      formData.append('images', newItem.images);
+
+      const response = await axios.post('http://localhost:8000/api/personal-information', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setPersonalInfo([...personalInfo, response.data]);
+      setIsAddModalOpen(false);
+      setNewItem({
+        first_name: '',
+        last_name: '',
+        email: '',
+        images: null
+      });
+    } catch (error) {
+      console.error('Error adding personal information:', error);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    setNewItem({ ...newItem, images: e.target.files[0] });
   };
 
   return (
@@ -86,12 +144,73 @@ export default function ProductsView() {
               onClick={() => handleUpdate(item._id)}
               variant="contained"
               color="primary"
+              sx={{ mr: 2 }}
             >
               Save
+            </Button>
+            <Button
+              onClick={() => handleDelete(item._id)}
+              variant="contained"
+              color="error"
+            >
+              Delete
             </Button>
           </CardContent>
         </Card>
       ))}
+      {personalInfo.length === 0 && (
+        <Button onClick={handleAdd} variant="contained" color="primary">
+          Add
+        </Button>
+      )}
+      <Modal open={isAddModalOpen} onClose={handleCloseAddModal}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography variant="h6" component="h2" gutterBottom>
+            Add Personal Information
+          </Typography>
+          <TextField
+            label="First Name"
+            value={newItem.first_name}
+            onChange={(e) => setNewItem({ ...newItem, first_name: e.target.value })}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Last Name"
+            value={newItem.last_name}
+            onChange={(e) => setNewItem({ ...newItem, last_name: e.target.value })}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Email"
+            value={newItem.email}
+            onChange={(e) => setNewItem({ ...newItem, email: e.target.value })}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+
+            />
+          <Button onClick={handleAddItem} variant="contained" color="primary">
+            Add
+          </Button>
+        </Box>
+      </Modal>
     </Container>
   );
 }
