@@ -5,10 +5,12 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
+
 
 export default function ProductsView() {
   const [personalInfo, setPersonalInfo] = useState([]);
@@ -116,47 +118,51 @@ export default function ProductsView() {
         Personal Information
       </Typography>
       {personalInfo.map((item) => (
-        <Card key={item._id} sx={{ mb: 3 }}>
-          <img src={`http://localhost:8000/${item.images}`} alt={`${item.first_name} ${item.last_name}`} height="140" />
-          <CardContent>
-            <TextField
-              label="First Name"
-              value={item.first_name}
-              onChange={(e) => handleChange(item._id, 'first_name', e.target.value)}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Last Name"
-              value={item.last_name}
-              onChange={(e) => handleChange(item._id, 'last_name', e.target.value)}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label="Email"
-              value={item.email}
-              onChange={(e) => handleChange(item._id, 'email', e.target.value)}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <Button
-              onClick={() => handleUpdate(item._id)}
-              variant="contained"
-              color="primary"
-              sx={{ mr: 2 }}
-            >
-              Save
-            </Button>
-            <Button
-              onClick={() => handleDelete(item._id)}
-              variant="contained"
-              color="error"
-            >
-              Delete
-            </Button>
-          </CardContent>
-        </Card>
+
+      <Card key={item._id} sx={{ mb: 3 }} style={{ boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' }}>
+        <CardContent>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+            <Avatar alt={`${item.first_name} ${item.last_name}`} src={`http://localhost:8000/${item.images}`} sx={{ width: 300, height: 300 }} />
+          </div>
+          <TextField
+            label="First Name"
+            value={item.first_name}
+            onChange={(e) => handleChange(item._id, 'first_name', e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Last Name"
+            value={item.last_name}
+            onChange={(e) => handleChange(item._id, 'last_name', e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Email"
+            value={item.email}
+            onChange={(e) => handleChange(item._id, 'email', e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <Button
+            onClick={() => handleUpdate(item._id)}
+            variant="contained"
+            color="primary"
+            sx={{ mr: 2 }}
+          >
+            Save
+          </Button>
+          <Button
+            onClick={() => handleDelete(item._id)}
+            variant="contained"
+            color="error"
+          >
+            Delete
+          </Button>
+        </CardContent>
+      </Card>
+
       ))}
       {personalInfo.length === 0 && (
         <Button onClick={handleAdd} variant="contained" color="primary">
@@ -205,7 +211,7 @@ export default function ProductsView() {
             accept="image/*"
             onChange={handleImageChange}
 
-            />
+          />
           <Button onClick={handleAddItem} variant="contained" color="primary">
             Add
           </Button>

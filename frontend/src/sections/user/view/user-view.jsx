@@ -1,176 +1,235 @@
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
-import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
-import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import TableBody from '@mui/material/TableBody';
-import Typography from '@mui/material/Typography';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
+import {
+    Card,
+    Grid,
+    Dialog,
+    Button,
+    TextField,
+    Container,
+    Typography,
+    DialogTitle,
+    CardContent,
+    DialogActions,
+    DialogContent,
+} from '@mui/material';
 
-import Iconify from 'src/components/iconify';
-import Scrollbar from 'src/components/scrollbar';
+const EducationForm = () => {
+    const [degree, setDegree] = useState('');
+    const [institution, setInstitution] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [educations, setEducations] = useState([]);
+    const [errors, setErrors] = useState({});
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [currentEducation, setCurrentEducation] = useState(null);
 
-import TableNoData from '../table-no-data';
-import UserTableRow from '../user-table-row';
-import UserTableHead from '../user-table-head';
-import TableEmptyRows from '../table-empty-rows';
-import UserTableToolbar from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/educations');
+                setEducations(response.data);
+            } catch (error) {
+                console.error('Error fetching educations:', error);
+            }
+        };
 
-export default function UserPage() {
-  const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(0);
-  const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
-  const [orderBy, setOrderBy] = useState('name');
-  const [filterName, setFilterName] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+        fetchData();
+    }, []);
 
-  useEffect(() => {
-    fetch('http://localhost:8000/api/users')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post('http://localhost:8000/api/educations', {
+                degree,
+                institution,
+                start_date: startDate,
+                end_date: endDate
+            });
+            console.log('Education added successfully:', response.data);
+            setEducations([...educations, response.data]);
+            setDegree('');
+            setInstitution('');
+            setStartDate('');
+            setEndDate('');
+            setErrors({});
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+                console.error('Error adding education:', error.response.data.errors);
+            } else {
+                console.error('Error adding education:', error);
+            }
         }
-        return response.json();
-      })
-      .then(data => {
-        setUsers(data);
-      })
-      .catch(error => {
-        console.error('Error fetching users:', error);
-      });
-  }, []);
+    };
 
-  const handleSort = (event, id) => {
-    const isAsc = orderBy === id && order === 'asc';
-    if (id !== '') {
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
-    }
-  };
+    const handleDelete = async (_id) => {
+        try {
+            await axios.delete(`http://localhost:8000/api/educations/${_id}`);
+            const updatedEducations = educations.filter(education => education._id !== _id);
+            setEducations(updatedEducations);
+        } catch (error) {
+            console.error('Error deleting education:', error);
+        }
+    };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = users.map((user) => user.name);
-      setSelected(newSelecteds);
-    } else {
-      setSelected([]);
-    }
-  };
+    const handleEditModalOpen = (education) => {
+        setCurrentEducation(education);
+        setEditModalOpen(true);
+    };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
+    const handleEditModalClose = () => {
+        setEditModalOpen(false);
+        setCurrentEducation(null);
+    };
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
+    const handleEditSubmit = async () => {
+        try {
+            const response = await axios.put(`http://localhost:8000/api/educations/${currentEducation._id}`, {
+                degree: currentEducation.degree,
+                institution: currentEducation.institution,
+                start_date: currentEducation.start_date,
+                end_date: currentEducation.end_date
+            });
+            console.log('Education edited successfully:', response.data);
+            // Update educations state with the edited education
+            const updatedEducations = educations.map(education =>
+                education._id === currentEducation._id ? response.data : education
+            );
+            setEducations(updatedEducations);
+            setEditModalOpen(false);
+            setCurrentEducation(null);
+        } catch (error) {
+            console.error('Error editing education:', error);
+        }
+    };
 
-    setSelected(newSelected);
-  };
+    return (
+        <Container maxWidth="md">
+            <Typography variant="h4" gutterBottom>
+                Add Education
+            </Typography>
+            <br />
+            <form onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                label="Degree"
+                                value={degree}
+                                onChange={(e) => setDegree(e.target.value)}
+                                fullWidth
+                                error={errors.degree !== undefined}
+                                helperText={errors.degree}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                label="Institution"
+                                value={institution}
+                                onChange={(e) => setInstitution(e.target.value)}
+                                fullWidth
+                                error={errors.institution !== undefined}
+                                helperText={errors.institution}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                fullWidth
+                                error={errors.start_date !== undefined}
+                                helperText={errors.start_date}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                fullWidth
+                                error={errors.end_date !== undefined}
+                                helperText={errors.end_date}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button type="submit" variant="contained" color="primary">
+                                Add Education
+                            </Button>
+                        </Grid>
+                    </Grid>                </Grid>
+            </form>
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+            {/* Display added educations */}
+            <Typography variant="h4" gutterBottom style={{ marginTop: '20px' }}>
+                Added Educations
+            </Typography>
+            <br />
+            <Grid container spacing={2}>
+                {educations.map((education, index) => (
+                    <Grid item xs={12} key={index}>
+                        <Card style={{ boxShadow: '0px 5px 10px rgba(2, 2, 2, 0.1)', background: 'rgba(231, 231, 231, 0.1)' }}>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    {education.degree}
+                                </Typography>
+                                <Typography variant="subtitle1" color="textSecondary">
+                                    {education.institution} | {education.start_date} - {education.end_date}
+                                </Typography>
+                                <br />
+                                <div style={{ justifyContent: "end" }}>
+                                <Button style={{margin:"12"}} onClick={() => handleDelete(education._id)} color='error' variant="contained">Delete</Button>
+                                <Button onClick={() => handleEditModalOpen(education)} variant="contained" color="primary">
+                                    Edit
+                                </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+                    </Grid>
+                ))}
+            </Grid>
 
-  const handleFilterByName = (event) => {
-    setFilterName(event.target.value);
-    setPage(0);
-  };
-
-  const dataFiltered = applyFilter({
-    inputData: users,
-    comparator: getComparator(order, orderBy),
-    filterName,
-  });
-
-  const notFound = !dataFiltered.length && !!filterName;
-
-  return (
-    <Container>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Users</Typography>
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
-        </Button>
-      </Stack>
-
-      <Card>
-        <UserTableToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
-
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={users.length}
-                numSelected={selected.length}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAllClick}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'email', label: 'Email' },
-                  { id: 'password', label: 'Password' },
-                ]}
-              />
-              <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      email={row.email}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
+            {/* Edit Education Modal */}
+            <Dialog open={editModalOpen} onClose={handleEditModalClose}>
+                <DialogTitle>Edit Education</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Degree"
+                        value={currentEducation ? currentEducation.degree : ''}
+                        onChange={(e) => setCurrentEducation({ ...currentEducation, degree: e.target.value })}
+                        fullWidth
                     />
-                    
-                  ))}
+                    <TextField
+                        label="Institution"
+                        value={currentEducation ? currentEducation.institution : ''}
+                        onChange={(e) => setCurrentEducation({ ...currentEducation, institution: e.target.value })}
+                        fullWidth
+                    />
+                    <TextField
+                        type="date"
+                        label="Start Date"
+                        value={currentEducation ? currentEducation.start_date : ''}
+                        onChange={(e) => setCurrentEducation({ ...currentEducation, start_date: e.target.value })}
+                        fullWidth
+                    />
+                    <TextField
+                        type="date"
+                        label="End Date"
+                        value={currentEducation ? currentEducation.end_date : ''}
+                        onChange={(e) => setCurrentEducation({ ...currentEducation, end_date: e.target.value })}
+                        fullWidth
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleEditModalClose}>Cancel</Button>
+                    <Button onClick={handleEditSubmit} color="primary">Save</Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
+    );
+};
 
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
-                />
-
-                {notFound && <TableNoData query={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
-
-        <TablePagination
-          page={page}
-          component="div"
-          count={users.length}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-    </Container>
-  );
-}
+export default EducationForm;

@@ -35,8 +35,16 @@ Route::put('/personal-information/{id}', [PersonalInformationController::class, 
 Route::delete('/personal-information/{id}', [PersonalInformationController::class, 'destroy']);
 
 
+//foreducations
+Route::get('/educations', [EducationController::class, 'index']);
+Route::post('/educations', [EducationController::class, 'store']);
+Route::get('/educations/{id}', [EducationController::class, 'show']);
+Route::put('/educations/{id}', [EducationController::class, 'update']);
+Route::delete('/educations/{id}', [EducationController::class, 'destroy']);
+
+
 // Route::middleware('auth:sanctum')->apiResource('personal-information', PersonalInformationController::class);
 
-Route::middleware('auth:sanctum')->apiResource('education', EducationController::class);
+// Route::middleware('auth:sanctum')->apiResource('education', EducationController::class);
 
 Route::middleware('auth:sanctum')->apiResource('experience', ExperienceController::class);
