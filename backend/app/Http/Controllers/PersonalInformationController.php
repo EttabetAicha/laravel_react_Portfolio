@@ -61,8 +61,8 @@ class PersonalInformationController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-      
-
+        // Handle image update
+       
         // Update personal information fields
         $personalInformation->first_name = $request->input('first_name');
         $personalInformation->last_name = $request->input('last_name');
