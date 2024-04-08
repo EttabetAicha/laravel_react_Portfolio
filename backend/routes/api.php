@@ -42,9 +42,16 @@ Route::get('/educations/{id}', [EducationController::class, 'show']);
 Route::put('/educations/{id}', [EducationController::class, 'update']);
 Route::delete('/educations/{id}', [EducationController::class, 'destroy']);
 
+//experiences
+Route::get('/experiences', [ExperienceController::class, 'index']);
+Route::post('/experiences', [ExperienceController::class, 'store']);
+Route::get('/experiences/{id}', [ExperienceController::class, 'show']);
+Route::put('/experiences/{id}', [ExperienceController::class, 'update']);
+Route::delete('/experiences/{id}', [ExperienceController::class, 'destroy']);
+
 
 // Route::middleware('auth:sanctum')->apiResource('personal-information', PersonalInformationController::class);
 
 // Route::middleware('auth:sanctum')->apiResource('education', EducationController::class);
 
-Route::middleware('auth:sanctum')->apiResource('experience', ExperienceController::class);
+// Route::middleware('auth:sanctum')->apiResource('experience', ExperienceController::class);
