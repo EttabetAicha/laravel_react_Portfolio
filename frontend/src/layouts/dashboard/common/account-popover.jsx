@@ -20,6 +20,7 @@ const MENU_OPTIONS = [
   {
     label: 'Home',
     icon: 'eva:home-fill',
+    route: '/portfolio', 
   },
   {
     label: 'Profile',
@@ -41,9 +42,11 @@ export default function AccountPopover() {
     setOpen(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (option) => () => {
     setOpen(null);
-    router.push('/');
+    if (option && option.route) {
+      router.push(option.route);
+    }
   };
 
   return (
@@ -76,7 +79,6 @@ export default function AccountPopover() {
       <Popover
         open={!!open}
         anchorEl={open}
-        onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
@@ -90,17 +92,17 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            Aicha ettabet
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+           aicha@gmail.com
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
+          <MenuItem key={option.label} onClick={handleClose(option)}>
             {option.label}
           </MenuItem>
         ))}
@@ -110,7 +112,7 @@ export default function AccountPopover() {
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={handleClose()}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout
