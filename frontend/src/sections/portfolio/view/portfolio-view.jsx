@@ -1,9 +1,12 @@
-import React from 'react'
+import "../styles/App.css";
+import Navbar from "../Navbar";
+import Home from "../Homescreen";
 
 export default function PortfolioView() {
     return (
-        <div>
-            <h1>PortfolioView</h1>
-        </div>
+        <>
+            <Navbar /> 
+             <Home />
+        </>
     )
 }
