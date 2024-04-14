@@ -21,7 +21,7 @@ jobs:
 
       - name: Set up Laravel environment
         run: |
-          cd laravel_project_directory  # Replace 'laravel_project_directory' with the actual directory name
+          cd backend  
           php -r "file_exists('.env') || copy('.env.example', '.env');"
 
       - name: Update .env for MongoDB
