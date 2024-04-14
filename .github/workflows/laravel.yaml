@@ -64,10 +64,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js (use specific version or latest)
-        uses: actions/setup-node@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '21'  # Replace with desired version (or 'latest')
+          node-version: '14'  # Use the desired Node.js version
           cache: 'npm'
 
       - name: Check nvm installation (Optional)
