@@ -1,0 +1,63 @@
+name: CI/CD pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  laravel-mongodb-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install MongoDB
+        run: sudo apt-get install -y mongodb
+
+      - name: Start MongoDB
+        run: sudo service mongod start
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Update .env for MongoDB
+        run: |
+          sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=mongodb/g' .env
+          sed -i 's/DB_HOST=127.0.0.1/DB_HOST=cluster0.m5zmwul.mongodb.net/g' .env
+          sed -i 's/DB_PORT=3306/DB_PORT=27017/g' .env
+          sed -i 's/DB_DATABASE=laravel/DB_DATABASE=test/g' .env
+          sed -i 's/DB_USERNAME=root/DB_USERNAME=aicha16ettabite/g' .env
+          sed -i 's/DB_PASSWORD=/DB_PASSWORD=2pHlyzmjkLsciADV/g' .env
+          # Set DB_URI if your Laravel version supports it
+          echo "DB_URI=mongodb+srv://aicha16ettabite:2pHlyzmjkLsciADV@cluster0.m5zmwul.mongodb.net/" >> .env
+
+      - name: Install Dependencies (Laravel)
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Generate key (Laravel)
+        run: php artisan key:generate
+
+      - name: Directory Permissions (Laravel)
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Execute Laravel tests via PHPUnit
+        run: php artisan test --testsuite=Unit
+
+  react-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Navigate to frontend directory
+        run: cd frontend
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '21'
+
+      - name: Install Dependencies (React)
+        run: npm install
+
+      - name: Build React App
+        run: npm run build
