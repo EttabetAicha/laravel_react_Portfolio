@@ -11,15 +11,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install MongoDB
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gnupg
-          curl -fsSL https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-          sudo apt-get update
-          sudo apt-get install -y mongodb-org
+      - name: Update package lists
+        run: sudo apt update
 
+      - name: Install MongoDB dependencies
+        run: sudo apt install -y gnupg curl
+
+      - name: Add MongoDB repository key
+        run: curl -fsSL https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+
+      - name: Add MongoDB repository
+        run: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+
+      - name: Install MongoDB
+        run: sudo apt install -y mongodb-org
 
       - name: Start MongoDB
         run: sudo systemctl start mongod
@@ -39,13 +44,13 @@ jobs:
           echo "DB_URI=mongodb+srv://aicha16ettabite:2pHlyzmjkLsciADV@cluster0.m5zmwul.mongodb.net/" >> .env
 
       - name: Install Dependencies (Laravel)
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer install --prefer-dist
 
       - name: Generate key (Laravel)
         run: php artisan key:generate
 
       - name: Directory Permissions (Laravel)
-        run: chmod -R 777 storage bootstrap/cache
+        run: chmod -R 755 storage bootstrap/cache  # Fix permission issue
 
       - name: Execute Laravel tests via PHPUnit
         run: php artisan test --testsuite=Unit
@@ -58,10 +63,8 @@ jobs:
       - name: Navigate to frontend directory
         run: cd frontend
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: Setup Node.js (use pre-installed version)
+        run: nvm use node  # Assuming Node Version Manager (nvm) is pre-configured, if not use actions/setup-node
 
       - name: Install Dependencies (React)
         run: npm install
