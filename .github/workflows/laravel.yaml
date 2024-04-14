@@ -60,25 +60,20 @@ jobs:
           php artisan test --testsuite=Unit
 
   react-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Navigate to frontend directory
-        run: cd frontend
+    - name: Navigate to frontend directory
+      run: cd frontend
 
-      - name: Check nvm installation (Optional)
-        run: which nvm
+    - name: Setup Node.js and NPM
+      uses: actions/setup-node@v3
+      with:
+        node-version: '21' 
+    - name: Install Dependencies (React)
+      run: npm install
 
-      - name: Load nvm configuration
-        run: source ~/.nvm/nvm.sh
+    - name: Build React App
+      run: npm run build
 
-      - name: Setup Node.js (use pre-installed version)
-        run: nvm use node
-
-      - name: Install Dependencies (React)
-        run: npm install
-
-      - name: Build React App
-        run: npm run build
-        working-directory: frontend
