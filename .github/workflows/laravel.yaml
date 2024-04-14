@@ -23,6 +23,14 @@ jobs:
       - name: Add MongoDB repository
         run: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 
+      # Update package lists again after adding repository
+      - name: Update package lists (again)
+        run: sudo apt update
+
+      # Fix potential package conflicts (optional)
+      - name: Fix package conflicts (optional)
+        run: sudo apt --fix-broken install
+
       - name: Install MongoDB
         run: sudo apt install -y mongodb-org
 
