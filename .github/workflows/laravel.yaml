@@ -37,7 +37,7 @@ jobs:
       - name: Install Dependencies (Laravel)
         run: |
           cd backend
-          composer install --prefer-dist
+          composer install --ignore-platform-req=ext-mongodb
 
       - name: Generate key (Laravel)
         run: |
