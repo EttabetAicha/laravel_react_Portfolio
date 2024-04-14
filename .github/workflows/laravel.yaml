@@ -36,22 +36,22 @@ jobs:
 
       - name: Install Dependencies (Laravel)
         run: |
-          cd laravel_project_directory  # Navigate to the Laravel project directory
+          cd backend
           composer install --prefer-dist
 
       - name: Generate key (Laravel)
         run: |
-          cd laravel_project_directory  # Navigate to the Laravel project directory
+          cd backend
           php artisan key:generate
 
       - name: Directory Permissions (Laravel)
         run: |
-          cd laravel_project_directory  # Navigate to the Laravel project directory
+          cd backend
           chmod -R 755 storage bootstrap/cache
 
       - name: Execute Laravel tests via PHPUnit
         run: |
-          cd laravel_project_directory  # Navigate to the Laravel project directory
+          cd backend
           php artisan test --testsuite=Unit
 
   react-tests:
