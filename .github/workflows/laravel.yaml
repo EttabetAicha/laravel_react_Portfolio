@@ -64,15 +64,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js with nvm
+      - name: Setup Node.js (use specific version or latest)
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '21'  # Replace with desired version (or 'latest')
           cache: 'npm'
 
-      - name: Check nvm installation
+      - name: Check nvm installation (Optional)
         run: |
-          echo "NVM version: $(nvm --version)"
           echo "Node.js version: $(node --version)"
           echo "NPM version: $(npm --version)"
 
@@ -82,5 +81,5 @@ jobs:
       - name: Install Dependencies (React)
         run: npm install
 
-      - name: Build React App
-        run: npm run build
+      - name: Run React Tests
+        run: npm test
