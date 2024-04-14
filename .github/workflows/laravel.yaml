@@ -62,21 +62,29 @@ jobs:
   react-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Use the desired Node.js version
+          node-version: '14'
           cache: 'npm'
 
-      - name: Check nvm installation (Optional)
+      - name: Check Node.js and NPM versions
         run: |
-          echo "Node.js version: $(node --version)"
-          echo "NPM version: $(npm --version)"
+          node --version
+          npm --version
 
       - name: Navigate to frontend directory
         run: cd frontend
+
+      - name: Verify lock file
+        run: |
+          if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ] && [ ! -f yarn.lock ]; then
+            echo "Lock file not found in the frontend directory. Exiting."
+            exit 1
+          fi
 
       - name: Install Dependencies (React)
         run: npm install
