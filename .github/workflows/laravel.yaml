@@ -14,36 +14,21 @@ jobs:
       - name: Update package lists
         run: sudo apt update
 
-      - name: Install MongoDB dependencies
-        run: sudo apt install -y gnupg curl
-
-      - name: Add MongoDB repository key
-        run: curl -fsSL https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-
-      - name: Add MongoDB repository
-        run: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-
-      # Update package lists again after adding repository
-      - name: Update package lists (again)
-        run: sudo apt update
-
-      # Fix potential package conflicts (optional)
-      - name: Fix package conflicts (optional)
-        run: sudo apt --fix-broken install
-
-      - name: Install MongoDB
-        run: sudo apt install -y mongodb-org
-
+      # Start MongoDB instance using action (replace version if needed)
       - name: Start MongoDB
-        run: sudo systemctl start mongod
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: '4.4'  # Replace with desired version
 
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
+      # Update .env for MongoDB (adjust DB_HOST if using local instance)
       - name: Update .env for MongoDB
         run: |
           sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=mongodb/g' .env
-          sed -i 's/DB_HOST=127.0.0.1/DB_HOST=cluster0.m5zmwul.mongodb.net/g' .env
+          # Adjust DB_HOST if using the local MongoDB instance
+          # sed -i 's/DB_HOST=127.0.0.1/DB_HOST=localhost/g' .env  # Uncomment if using local instance
           sed -i 's/DB_PORT=3306/DB_PORT=27017/g' .env
           sed -i 's/DB_DATABASE=laravel/DB_DATABASE=test/g' .env
           sed -i 's/DB_USERNAME=root/DB_USERNAME=aicha16ettabite/g' .env
