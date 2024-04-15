@@ -86,4 +86,6 @@ jobs:
           npm install
 
       - name: Run React Tests
-        run: npm test
+        run: |
+          cd frontend
+          npm test
