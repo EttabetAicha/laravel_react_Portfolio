@@ -83,17 +83,17 @@ jobs:
       - name: Debugging Output
         run: |
           ls -la
-          cat package-lock.json
-          cat yarn.lock
+          cat yarn.lock  # Print contents of yarn.lock for debugging purposes
 
       - name: Verify lock file
         run: |
-          if [ -f package-lock.json ] || [ -f yarn.lock ]; then
+          if [ -f yarn.lock ]; then
             echo "Lock file found."
           else
             echo "Lock file not found in the frontend directory. Exiting."
             exit 1
           fi
+
 
       - name: Install Dependencies (React)
         run: npm install
