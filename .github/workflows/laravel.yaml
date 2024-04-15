@@ -82,12 +82,15 @@ jobs:
 
       - name: Debugging Output
         run: |
-          cd frontend
           ls -la
+          cat package-lock.json
+          cat yarn.lock
 
       - name: Verify lock file
         run: |
-          if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ] && [ ! -f yarn.lock ]; then
+          if [ -f package-lock.json ] || [ -f yarn.lock ]; then
+            echo "Lock file found."
+          else
             echo "Lock file not found in the frontend directory. Exiting."
             exit 1
           fi
