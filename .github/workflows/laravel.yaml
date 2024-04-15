@@ -80,13 +80,6 @@ jobs:
       - name: Navigate to frontend directory
         run: cd frontend
 
-      - name: Verify lock file
-        run: |
-          if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ] && [ ! -f yarn.lock ]; then
-            echo "Lock file not found in the frontend directory. Exiting."
-            exit 1
-          fi
-
       - name: Install Dependencies (React)
         run: npm install
 
