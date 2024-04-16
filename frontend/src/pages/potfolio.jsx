@@ -8,7 +8,7 @@ export default function PortfolioPage() {
     return (
         <>
             <Helmet>
-                <title> portfolio | Minimal UI </title>
+                <title> portfolio </title>
             </Helmet>
 
             <PortfolioView />

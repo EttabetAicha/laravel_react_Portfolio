@@ -11,7 +11,6 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 
-
 export default function ProductsView() {
   const [personalInfo, setPersonalInfo] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
