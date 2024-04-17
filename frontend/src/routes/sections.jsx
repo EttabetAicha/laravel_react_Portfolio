@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense ,useState} from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
@@ -14,20 +14,31 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  // const handleLogout = () => {
+  //   // Implement your logout logic here
+  //   setIsAuthenticated(false);
+  // };
+
   const routes = useRoutes([
     {
       path: '/',
-      element: <LoginPage />,
+      element: <LoginPage onLogin={handleLogin} />, 
     },
-
-
     {
-      element: (
+      element: isAuthenticated ? ( 
         <DashboardLayout>
           <Suspense>
             <Outlet />
           </Suspense>
         </DashboardLayout>
+      ) : (
+        <Navigate to="/" replace />
       ),
       children: [
         { path: 'app', element: <IndexPage /> },
@@ -36,16 +47,9 @@ export default function Router() {
         { path: 'blog', element: <BlogPage /> },
       ],
     },
-            { path: 'portfolio', element: <PortfolioPage /> },
-
-    {
-      path: '404',
-      element: <Page404 />,
-    },
-    {
-      path: '*',
-      element: <Navigate to="/404" replace />,
-    },
+    { path: 'portfolio', element: <PortfolioPage /> },
+    { path: '404', element: <Page404 /> },
+    { path: '*', element: <Navigate to="/404" replace /> },
   ]);
 
   return routes;
